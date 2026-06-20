@@ -1,0 +1,49 @@
+# Local agent/editor state
+.agents/
+.codex/
+.git-real/
+
+# Runtime environments and package caches
+tools/
+velora-frontend/node_modules/
+
+# Build outputs and caches
+velora-frontend/dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Production-only secrets and generated credentials
+ops/generated-*-password.txt
+ops/**/generated-*-password.txt
+ops/prod/secrets/
+*.env
+.env
+.env.*
+
+# Backups, quarantined files, and operational snapshots
+backups/
+model-backups/
+quarantine/
+
+# Runtime uploads and logs
+uploads/
+logs/
+*.log
+
+# Local validation audio and sample assets
+test_data/
+velora-frontend/public/test-assets/
+
+# Model binaries should be distributed outside normal Git history.
+*.h5
+*.keras
+*.onnx
+*.pt
+*.pth
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

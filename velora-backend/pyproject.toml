@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "sorimemo-backend"
+version = "0.1.0"
+description = "SoriMemo backend API for 안심소리 기억케어"
+authors = ["Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+fastapi = {extras = ["standard"], version = "^0.135.2"}
+python-multipart = "^0.0.22"
+librosa = "^0.11.0"
+soundfile = "^0.13.1"
+numpy = "1.26.4"
+scipy = "^1.17.1"
+scikit-learn = "^1.8.0"
+pydub = "^0.25.1"
+tensorflow = "2.15.1"
+keras = "2.15.0"
+h5py = "^3.16.0"
+matplotlib = "^3.10.8"
+pillow = "^11.3.0"
+sqlalchemy = "^2.0.41"
+psycopg = {extras = ["binary"], version = "^3.2.9"}
+faster-whisper = "^1.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

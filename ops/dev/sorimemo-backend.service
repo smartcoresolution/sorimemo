@@ -1,0 +1,22 @@
+[Unit]
+Description=SoriMemo Backend FastAPI
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=scs_dev
+Group=scs_dev
+WorkingDirectory=/home/scs_dev/velora
+Environment=APP_ROOT=/home/scs_dev/velora
+Environment=BACKEND_PORT=8011
+Environment=MPLCONFIGDIR=/tmp/sorimemo_mplconfig
+Environment=SORIMEMO_DB_NAME=sorimemo_dev
+Environment=SORIMEMO_DB_USER=sorimemo_app
+Environment=SORIMEMO_DB_PASSWORD_FILE=/home/scs_dev/velora/ops/generated-sorimemo-dev-db-password.txt
+ExecStart=/bin/bash /home/scs_dev/velora/ops/run_dev_backend.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

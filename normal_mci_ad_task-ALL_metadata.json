@@ -1,0 +1,69 @@
+{
+  "task": "ALL",
+  "task_dir": "/home/ubuntu/workspace/nasw/download/prepared_normal_mci_ad/multiclass/ALL",
+  "class_indices": {
+    "AD": 0,
+    "MCI": 1,
+    "Normal": 2
+  },
+  "class_names": [
+    "AD",
+    "MCI",
+    "Normal"
+  ],
+  "image_size": [
+    100,
+    100
+  ],
+  "weights": "imagenet",
+  "fine_tune_from": "block5_conv1",
+  "preprocessing": {
+    "source_root": "/home/ubuntu/workspace/dataset/dataset001/045.인지기능 장애 진단을 위한 음성-대화 데이터/01.데이터/0.최종데이터(100%)",
+    "source_roots_scanned": [
+      "/home/ubuntu/workspace/dataset/dataset001/045.인지기능 장애 진단을 위한 음성-대화 데이터/01.데이터/0.최종데이터(100%)",
+      "/home/ubuntu/workspace/dataset"
+    ],
+    "json_roots_scanned": [
+      "/home/ubuntu/workspace/dataset/dataset001/045.인지기능 장애 진단을 위한 음성-대화 데이터/01.데이터/0.최종데이터(100%)/IB-APPS",
+      "/home/ubuntu/workspace/dataset/dataset001/045.인지기능 장애 진단을 위한 음성-대화 데이터/01.데이터/0.최종데이터(100%)/CERAD-K",
+      "/home/ubuntu/workspace/dataset/dataset001/045.인지기능 장애 진단을 위한 음성-대화 데이터/01.데이터/0.최종데이터(100%)/SNSB-II",
+      "/home/ubuntu/workspace/dataset/IB-APPS"
+    ],
+    "metadata_csv": "",
+    "audio_kind": "raw",
+    "recursive_audio_search": true,
+    "sample_rate": 48000,
+    "seconds": 30,
+    "dpi": 100,
+    "train_ratio": 0.7,
+    "val_ratio": 0.15,
+    "paper_types": [
+      "IB-APPS",
+      "CERAD-K",
+      "SNSB-II"
+    ],
+    "task_offset": 1,
+    "counts": {
+      "read": 5791,
+      "written": 5791,
+      "skipped_unknown_label": 0,
+      "skipped_missing_audio": 0,
+      "skipped_task_filter": 0,
+      "json_errors": 0
+    },
+    "path": "/home/ubuntu/workspace/nasw/download/prepared_normal_mci_ad/preprocessing_config.json"
+  },
+  "learning_rate": 0.0001,
+  "batch_size": 16,
+  "epochs_requested": 100,
+  "epochs_trained": 14,
+  "resumed": false,
+  "loaded_model_path": "",
+  "best_model_path": "/home/ubuntu/workspace/nasw/download/ad_mci_normal/task-ALL/normal_mci_ad_task-ALL_best.h5",
+  "final_model_path": "/home/ubuntu/workspace/nasw/download/ad_mci_normal/task-ALL/normal_mci_ad_task-ALL_final.h5",
+  "training_log_path": "/home/ubuntu/workspace/nasw/download/ad_mci_normal/task-ALL/normal_mci_ad_task-ALL_20260528-093658.csv",
+  "test_metrics": {
+    "loss": 1.0644114017486572,
+    "accuracy": 0.4637865424156189
+  }
+}
