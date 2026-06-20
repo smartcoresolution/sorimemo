@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.exc import SQLAlchemyError
-from app.database import execute, execute_many, get_consent_by_token, insert_returning
+from app.database import execute, execute_many, fetch_one, get_consent_by_token, insert_returning
 from app.models.schemas import ConsentRequest, ConsentResponse
 from app.routers.auth import get_current_user
 
@@ -263,6 +263,58 @@ async def upsert_consent_subject(
         "subject_age_group": request.subject_age_group,
         "subject_gender": gender,
         "message": "검증 대상자 정보가 저장되었습니다.",
+    }
+
+
+@router.get("/latest")
+async def latest_consent(current_user: dict = Depends(get_current_user)):
+    ensure_subject_schema()
+    row = fetch_one(
+        """
+        SELECT
+            c.id,
+            c.subject_id,
+            c.consent_token,
+            c.policy_version,
+            c.agreed_at,
+            c.model_training_agreed,
+            c.model_training_retention_days,
+            s.subject_type,
+            s.relation AS subject_relation,
+            s.display_name AS subject_display_name,
+            s.age_group AS subject_age_group,
+            s.gender AS subject_gender
+        FROM consents c
+        LEFT JOIN care_subjects s ON s.id = c.subject_id
+        WHERE c.user_id = CAST(:user_id AS uuid)
+          AND c.revoked_at IS NULL
+          AND c.policy_version = :policy_version
+          AND c.data_collection_agreed IS true
+          AND c.privacy_policy_agreed IS true
+          AND c.non_medical_disclaimer_agreed IS true
+          AND c.third_party_voice_agreed IS true
+        ORDER BY c.agreed_at DESC
+        LIMIT 1
+        """,
+        {
+            "user_id": current_user["user_id"],
+            "policy_version": POLICY_VERSION,
+        },
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="현재 정책 버전에 대한 동의 기록이 없습니다.")
+    return {
+        "consent_token": str(row["consent_token"]),
+        "policy_version": row["policy_version"],
+        "agreed_at": row["agreed_at"].isoformat() if row.get("agreed_at") else None,
+        "subject_id": str(row["subject_id"]) if row.get("subject_id") else None,
+        "subject_type": row.get("subject_type"),
+        "subject_relation": row.get("subject_relation"),
+        "subject_display_name": row.get("subject_display_name"),
+        "subject_age_group": row.get("subject_age_group"),
+        "subject_gender": row.get("subject_gender"),
+        "model_training_agreed": bool(row.get("model_training_agreed")),
+        "model_training_retention_days": row.get("model_training_retention_days"),
     }
 
 

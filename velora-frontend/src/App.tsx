@@ -20,7 +20,9 @@ import AdminLoginPage from './pages/AdminLoginPage'
 import RecordingGuidePage from './pages/RecordingGuidePage'
 import {
   clearAdminSession,
+  clearUserSession,
   deleteResultHistoryItem,
+  fetchLatestConsent,
   getResultsHistory,
   hasAdminSession,
   hasUserSession,
@@ -730,8 +732,9 @@ function App() {
         signupPassword: '',
         signupPasswordConfirm: '',
         signupError: '',
+        loginPassword: '',
+        loginError: '',
       })
-      void refreshHistory()
       setConsentBackStep('signup')
       setStep('consent')
     } catch (error) {
@@ -749,19 +752,25 @@ function App() {
         email: state.email.trim(),
         password: state.loginPassword,
       })
+      const latestConsent = await fetchLatestConsent()
       localStorage.setItem('sorimemo_member_ready', 'true')
-      setActiveConsentToken('')
+      const consentToken = latestConsent?.consent_token || ''
+      setActiveConsentToken(consentToken)
       setIsMember(true)
       updateState({
         email: account.email || state.email.trim(),
         displayName: account.display_name || state.displayName,
         signupPurpose: account.signup_purpose || state.signupPurpose,
         ageGroup: account.age_group || state.ageGroup || 'other',
-        consentToken: '',
+        consentToken,
         fileId: '',
         voiceSampleId: '',
         voiceSampleDurationSeconds: 0,
         verificationType: 'parent_call',
+        subjectDisplayName: latestConsent?.subject_display_name || '',
+        subjectAgeGroup: latestConsent?.subject_age_group || '',
+        subjectGender: latestConsent?.subject_gender || '',
+        subjectRelation: latestConsent?.subject_relation || '',
         analysisId: '',
         analysisResult: null,
         resultsData: null,
@@ -770,7 +779,7 @@ function App() {
       })
       void refreshHistory()
       setConsentBackStep('login')
-      setStep('consent')
+      setStep(consentToken ? 'service' : 'consent')
     } catch (error) {
       updateState({ loginError: error instanceof Error ? error.message : '로그인 중 오류가 발생했습니다.' })
     }
@@ -967,6 +976,7 @@ function App() {
     'analyzing',
     'results',
     'reliability',
+    'history',
     'recordingGuide',
   ]
   const usesLargeTitle = largeTitleSteps.includes(step)
@@ -1013,7 +1023,7 @@ function App() {
           <header className="flex items-center justify-between px-5 pb-2 pt-5">
             <button
               onClick={goBack}
-              className="flex h-11 w-14 items-center justify-start rounded-full text-[24px] font-black text-[#0b7074] hover:bg-[#e8f3f1]"
+              className="flex h-12 w-16 items-center justify-start rounded-full text-[26px] font-black text-[#0b7074] hover:bg-[#e8f3f1]"
               aria-label="이전"
             >
               ←
@@ -1023,7 +1033,7 @@ function App() {
             </h1>
             <button
               onClick={goHome}
-              className="flex h-11 w-16 items-center justify-end rounded-full text-[17px] font-black text-[#0b7074] hover:bg-[#e8f3f1]"
+              className="flex h-12 w-20 items-center justify-end rounded-full text-[26px] font-black text-[#0b7074] hover:bg-[#e8f3f1]"
               aria-label="홈으로"
             >
               홈
@@ -1037,10 +1047,10 @@ function App() {
               <div className="flex justify-end pt-5">
                 <Button
                   variant="outline"
-                  className="h-12 rounded-full border-[#d7e6e2] bg-white px-5 text-[16px] font-black text-[#0f6f73] shadow-none hover:bg-[#f4faf8]"
+                  className="h-14 rounded-full border-[#d7e6e2] bg-white px-6 text-[24px] font-black text-[#0f6f73] shadow-none hover:bg-[#f4faf8]"
                   onClick={() => setStep('signup')}
                 >
-                  <UserPlus className="mr-2 h-5 w-5" />
+                  <UserPlus className="mr-2 h-6 w-6" />
                   회원가입
                 </Button>
               </div>
@@ -1162,6 +1172,20 @@ function App() {
               subjectGender={state.subjectGender}
               subjectRelation={state.subjectRelation}
               onComplete={(token, ageGroup) => {
+                if (consentBackStep === 'signup') {
+                  setActiveConsentToken('')
+                  clearUserSession()
+                  setIsMember(false)
+                  updateState({
+                    consentToken: '',
+                    ageGroup,
+                    loginPassword: '',
+                    loginError: '회원가입과 동의가 완료되었습니다. 새 계정으로 로그인해 주세요.',
+                  })
+                  setConsentBackStep('login')
+                  setStep('login')
+                  return
+                }
                 setActiveConsentToken(token)
                 updateState({ consentToken: token, ageGroup })
                 setStep('service')

@@ -92,7 +92,7 @@ export default function SignupPage({ email, displayName, signupPurpose, password
         disabled={!canContinue}
         className="h-[68px] w-full rounded-full bg-[#0f7d82] text-[20px] font-black text-white shadow-none hover:bg-[#0b6f74]"
       >
-        서비스 확인으로 이동
+        동의 절차로 이동
       </Button>
     </div>
   )

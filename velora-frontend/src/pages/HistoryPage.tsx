@@ -9,12 +9,6 @@ interface HistoryPageProps {
   onDelete: (analysisId: string) => void
 }
 
-function toQualityLabel(score: number) {
-  if (score >= 0.75) return '양호'
-  if (score >= 0.5) return '보통'
-  return '미흡'
-}
-
 function getVerificationLabel(item: Record<string, any>) {
   return item.verification_type === 'self_voice' ? '내 목소리 검증' : '부모님 통화 검증'
 }
@@ -89,65 +83,68 @@ export default function HistoryPage({ items, onSelect, onRestart, onDelete }: Hi
         <>
           {latestItem && latestAnalysis && latestPattern && (
             <section className="rounded-[26px] border border-[#dce9e6] bg-white p-5 shadow-sm shadow-teal-950/5">
-              <p className="text-[17px] font-black text-[#183f40]">최근 검증 요약</p>
-              <p className="mt-2 text-[16px] font-bold leading-[1.45] text-[#8aa09e]">가로축은 값, 세로축은 검증 날짜입니다.</p>
+              <p className="text-[22px] font-black text-[#183f40]">최근 검증 요약</p>
+              <p className="mt-3 text-[18px] font-bold leading-[1.5] text-[#6f8785]">
+                참고값은 0에서 100 사이로 표시되며, 값이 낮을수록 위험 신호가 높게 해석됩니다.
+              </p>
 
-              <div className="mt-4 rounded-2xl bg-[#f1f8f6] p-4">
-                <div className="mb-2 flex justify-between px-[78px] text-[13px] font-black text-[#8aa09e]">
+              <div className="mt-5 rounded-2xl bg-[#f1f8f6] p-4">
+                <div className="mb-3 flex justify-between px-[80px] text-[15px] font-black text-[#8aa09e]">
                   <span>0</span>
                   <span>50</span>
                   <span>100</span>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {chartRows.map(row => (
-                    <div key={row.id} className="grid grid-cols-[86px_1fr_42px] items-center gap-2">
-                      <p className="truncate text-[13px] font-black text-[#607b79]">{row.date}</p>
-                      <div className="h-3.5 rounded-full bg-white">
+                    <div key={row.id} className="grid grid-cols-[92px_1fr_54px] items-center gap-2">
+                      <p className="truncate text-[15px] font-black text-[#607b79]">{row.date}</p>
+                      <div className="h-4 rounded-full bg-white">
                         <div className="h-full rounded-full" style={{ width: `${row.value}%`, backgroundColor: row.color }} />
                       </div>
-                      <p className="text-right text-[13px] font-black text-[#183f40]">{row.value}%</p>
+                      <p className="text-right text-[16px] font-black text-[#183f40]">{row.value}</p>
                     </div>
                   ))}
                 </div>
-                <p className="mt-4 text-[15px] font-black text-[#183f40]">{chartRows[0]?.label}</p>
+                <p className="mt-5 text-[18px] font-black leading-[1.45] text-[#183f40]">{chartRows[0]?.label}</p>
               </div>
             </section>
           )}
 
-          <p className="px-1 text-[16px] font-black text-[#426160]">검증 이력</p>
+          <p className="px-1 text-[21px] font-black text-[#426160]">검증 이력</p>
 
           {items.map(item => {
             const analysis = item.analysis as Record<string, any>
-            const confidenceScore = Number(analysis.confidence_score || 0)
-            const confidencePercent = Math.round(confidenceScore * 100)
-            const confidenceLabel = toQualityLabel(confidenceScore)
+            const pattern = getPatternSummary(analysis)
             const checkedAt = item.saved_at || item.created_at || analysis.created_at
             return (
               <div
                 key={analysis.analysis_id}
-                className="rounded-2xl border border-[#e3ece9] bg-white p-4 shadow-sm shadow-teal-950/5"
+                className="rounded-2xl border border-[#e3ece9] bg-white p-5 shadow-sm shadow-teal-950/5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <button onClick={() => onSelect(item)} className="min-w-0 flex-1 text-left">
-                    <p className="text-[16px] font-black text-[#183f40]">{formatDate(checkedAt)}</p>
-                    <p className="mt-2 text-[16px] font-bold leading-[1.45] text-[#6f8785]">
-                      {getVerificationLabel(item)} · 결과 신뢰도 {confidenceLabel} · {confidencePercent}%
+                    <p className="text-[20px] font-black leading-[1.35] text-[#183f40]">{formatDate(checkedAt)}</p>
+                    <p className="mt-3 text-[18px] font-bold leading-[1.5] text-[#6f8785]">
+                      {getVerificationLabel(item)} · {pattern.label}
+                    </p>
+                    <p className="mt-2 text-[18px] font-black leading-[1.4] text-[#0f7d82]">
+                      참고값 {pattern.value}
                     </p>
                   </button>
                   <div className="flex shrink-0 items-center gap-2">
                     <button
                       onClick={() => onDelete(String(analysis.analysis_id || ''))}
-                      className="flex h-11 w-11 items-center justify-center rounded-full text-[#8aa09e] hover:bg-red-50 hover:text-red-500"
+                      className="flex h-12 w-12 items-center justify-center rounded-full text-[#8aa09e] hover:bg-red-50 hover:text-red-500"
                       aria-label="이력 삭제"
                     >
-                      <Trash2 className="h-5 w-5" />
+                      <Trash2 className="h-6 w-6" />
                     </button>
                     <button
                       onClick={() => onSelect(item)}
-                      className="flex h-11 w-11 items-center justify-center rounded-full text-[#8aa09e] hover:bg-[#f1f8f6]"
+                      className="flex h-12 w-12 items-center justify-center rounded-full text-[#8aa09e] hover:bg-[#f1f8f6]"
                       aria-label="결과 보기"
                     >
-                      <ChevronRight className="h-6 w-6" />
+                      <ChevronRight className="h-7 w-7" />
                     </button>
                   </div>
                 </div>

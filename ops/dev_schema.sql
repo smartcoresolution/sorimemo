@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS audio_files (
     retention_expires_at timestamptz,
     created_at timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT audio_files_status_check CHECK (
-        status IN ('uploaded', 'converted', 'rejected', 'analyzed', 'raw_deleted', 'deleted')
+        status IN ('uploaded', 'converted', 'rejected', 'analyzed', 'raw_deleted', 'training_retained', 'deleted')
     )
 );
 

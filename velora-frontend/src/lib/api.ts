@@ -154,6 +154,14 @@ export async function submitConsent(data: {
   }
 }
 
+export async function fetchLatestConsent() {
+  const res = await tryFetch(`${API_URL}/api/consent/latest`, {
+    headers: authHeaders(),
+  });
+  if (res.status === 404) return null;
+  return parseJsonResponse(res, "동의 기록 확인에 실패했습니다.");
+}
+
 export async function saveConsentSubject(consentToken: string, data: {
   subject_type: "self" | "parent";
   subject_relation?: string;
